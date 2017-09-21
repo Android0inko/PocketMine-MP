@@ -134,14 +134,7 @@ namespace pocketmine {
 		echo "[CRITICAL] Please update your submodules or use provided builds." . PHP_EOL;
 		exit(1);
 	}
-
-	if(is_file(\pocketmine\PATH . "vendor/autoload.php")){
-		require_once(\pocketmine\PATH . "vendor/autoload.php");
-	}else{
-		echo "[CRITICAL] Composer autoloader not found" . PHP_EOL;
-		echo "[CRITICAL] Please initialize composer dependencies before running." . PHP_EOL;
-		exit(1);
-	}
+	
 
 	if(!class_exists("ClassLoader", false)){
 		require_once(\pocketmine\PATH . "src/spl/ClassLoader.php");
