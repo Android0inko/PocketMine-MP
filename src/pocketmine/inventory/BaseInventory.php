@@ -30,7 +30,6 @@ use pocketmine\network\mcpe\protocol\InventoryContentPacket;
 use pocketmine\network\mcpe\protocol\InventorySlotPacket;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\Player;
-use pocketmine\Server;
 
 abstract class BaseInventory implements Inventory{
 
@@ -107,7 +106,7 @@ abstract class BaseInventory implements Inventory{
 	 * @param Item[] $items
 	 * @param bool   $send
 	 */
-	public function setContents(array $items, bool $send = true){
+	public function setContents(array $items, bool $send = true) : void{
 		if(count($items) > $this->getSize()){
 			$items = array_slice($items, 0, $this->getSize(), true);
 		}
@@ -181,7 +180,7 @@ abstract class BaseInventory implements Inventory{
 		return $slots;
 	}
 
-	public function remove(Item $item){
+	public function remove(Item $item) : void{
 		$checkDamage = !$item->hasAnyDamageValue();
 		$checkTags = $item->hasCompoundTag();
 
@@ -226,7 +225,7 @@ abstract class BaseInventory implements Inventory{
 				if(($diff = $slot->getMaxStackSize() - $slot->getCount()) > 0){
 					$item->setCount($item->getCount() - $diff);
 				}
-			}elseif($slot->getId() === Item::AIR){
+			}elseif($slot->isNull()){
 				$item->setCount($item->getCount() - $this->getMaxStackSize());
 			}
 
@@ -252,7 +251,7 @@ abstract class BaseInventory implements Inventory{
 
 		for($i = 0; $i < $this->getSize(); ++$i){
 			$item = $this->getItem($i);
-			if($item->getId() === Item::AIR or $item->getCount() <= 0){
+			if($item->isNull()){
 				$emptySlots[] = $i;
 			}
 
@@ -307,7 +306,7 @@ abstract class BaseInventory implements Inventory{
 
 		for($i = 0; $i < $this->getSize(); ++$i){
 			$item = $this->getItem($i);
-			if($item->getId() === Item::AIR or $item->getCount() <= 0){
+			if($item->isNull()){
 				continue;
 			}
 
@@ -335,7 +334,7 @@ abstract class BaseInventory implements Inventory{
 		return $this->setItem($index, ItemFactory::get(Item::AIR, 0, 0), $send);
 	}
 
-	public function clearAll(){
+	public function clearAll() : void{
 		for($i = 0, $size = $this->getSize(); $i < $size; ++$i){
 			$this->clear($i, false);
 		}
@@ -354,7 +353,7 @@ abstract class BaseInventory implements Inventory{
 		return $this->holder;
 	}
 
-	public function setMaxStackSize(int $size){
+	public function setMaxStackSize(int $size) : void{
 		$this->maxStackSize = $size;
 	}
 
@@ -368,19 +367,19 @@ abstract class BaseInventory implements Inventory{
 		return true;
 	}
 
-	public function close(Player $who){
+	public function close(Player $who) : void{
 		$this->onClose($who);
 	}
 
-	public function onOpen(Player $who){
+	public function onOpen(Player $who) : void{
 		$this->viewers[spl_object_hash($who)] = $who;
 	}
 
-	public function onClose(Player $who){
+	public function onClose(Player $who) : void{
 		unset($this->viewers[spl_object_hash($who)]);
 	}
 
-	public function onSlotChange(int $index, Item $before, bool $send){
+	public function onSlotChange(int $index, Item $before, bool $send) : void{
 		if($send){
 			$this->sendSlot($index, $this->getViewers());
 		}
@@ -390,7 +389,7 @@ abstract class BaseInventory implements Inventory{
 	/**
 	 * @param Player|Player[] $target
 	 */
-	public function sendContents($target){
+	public function sendContents($target) : void{
 		if($target instanceof Player){
 			$target = [$target];
 		}
@@ -416,7 +415,7 @@ abstract class BaseInventory implements Inventory{
 	 * @param int             $index
 	 * @param Player|Player[] $target
 	 */
-	public function sendSlot(int $index, $target){
+	public function sendSlot(int $index, $target) : void{
 		if($target instanceof Player){
 			$target = [$target];
 		}

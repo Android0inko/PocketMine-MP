@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace pocketmine\inventory\transaction\action;
 
 use pocketmine\inventory\Inventory;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
@@ -79,6 +80,15 @@ class SlotChangeAction extends InventoryAction{
 	}
 
 	/**
+	 * Adds this action's target inventory to the transaction's inventory list.
+	 *
+	 * @param InventoryTransaction $transaction
+	 */
+	public function onAddToTransaction(InventoryTransaction $transaction) : void{
+		$transaction->addInventory($this->inventory);
+	}
+
+	/**
 	 * Sets the item into the target inventory.
 	 *
 	 * @param Player $source
@@ -94,7 +104,7 @@ class SlotChangeAction extends InventoryAction{
 	 *
 	 * @param Player $source
 	 */
-	public function onExecuteSuccess(Player $source){
+	public function onExecuteSuccess(Player $source) : void{
 		$viewers = $this->inventory->getViewers();
 		unset($viewers[spl_object_hash($source)]);
 		$this->inventory->sendSlot($this->inventorySlot, $viewers);
@@ -105,7 +115,7 @@ class SlotChangeAction extends InventoryAction{
 	 *
 	 * @param Player $source
 	 */
-	public function onExecuteFail(Player $source){
+	public function onExecuteFail(Player $source) : void{
 		$this->inventory->sendSlot($this->inventorySlot, $source);
 	}
 }

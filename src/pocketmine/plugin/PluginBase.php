@@ -160,9 +160,9 @@ abstract class PluginBase implements Plugin{
 	 * @param string        $label
 	 * @param string[]      $args
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+	public function onCommand(CommandSender $sender, Command $command,$label, array $args){
 		return false;
 	}
 

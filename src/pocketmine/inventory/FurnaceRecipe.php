@@ -24,8 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\inventory;
 
 use pocketmine\item\Item;
-use pocketmine\Server;
-use pocketmine\utils\UUID;
 
 class FurnaceRecipe implements Recipe{
 
@@ -65,7 +63,7 @@ class FurnaceRecipe implements Recipe{
 		return clone $this->output;
 	}
 
-	public function registerToCraftingManager(CraftingManager $manager){
+	public function registerToCraftingManager(CraftingManager $manager) : void{
 		$manager->registerFurnaceRecipe($this);
 	}
 }

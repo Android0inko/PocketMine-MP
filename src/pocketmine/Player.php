@@ -78,7 +78,7 @@ use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\ShapedRecipe;
 use pocketmine\inventory\ShapelessRecipe;
 use pocketmine\inventory\transaction\action\InventoryAction;
-use pocketmine\inventory\transaction\SimpleInventoryTransaction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\ChunkLoader;
@@ -158,7 +158,6 @@ use pocketmine\resourcepacks\ResourcePack;
 use pocketmine\tile\ItemFrame;
 use pocketmine\tile\Spawnable;
 use pocketmine\tile\Tile;
-use pocketmine\utils\MainLogger;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\UUID;
 
@@ -2174,19 +2173,20 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 		/** @var InventoryAction[] $actions */
 		$actions = [];
 		foreach($packet->actions as $networkInventoryAction){
-			try{
-				$action = $networkInventoryAction->createInventoryAction($this);
-				$actions[] = $action;
-			}catch(\Throwable $e){
-				MainLogger::getLogger()->debug("Unhandled inventory action from " . $this->getName() . ": " . $e->getMessage());
+			$action = $networkInventoryAction->createInventoryAction($this);
+
+			if($action === null){
+				$this->server->getLogger()->debug("Unmatched inventory action from " . $this->getName() . ": " . json_encode($networkInventoryAction));
 				$this->sendAllInventories();
 				return false;
 			}
+
+			$actions[] = $action;
 		}
 
 		switch($packet->transactionType){
 			case InventoryTransactionPacket::TYPE_NORMAL:
-				$transaction = new SimpleInventoryTransaction($this, $actions);
+				$transaction = new InventoryTransaction($this, $actions);
 
 				if(!$transaction->execute()){
 					foreach($transaction->getInventories() as $inventory){
@@ -2196,7 +2196,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 						}
 					}
 
-					MainLogger::getLogger()->debug("Failed to execute inventory transaction from " . $this->getName() . " with actions: " . json_encode($packet->actions));
+					$this->server->getLogger()->debug("Failed to execute inventory transaction from " . $this->getName() . " with actions: " . json_encode($packet->actions));
 
 					//TODO: check more stuff that might need reversion
 					return false; //oops!
@@ -2386,7 +2386,7 @@ class Player extends Human implements CommandSender, ChunkLoader, IPlayer{
 							if($this->isSurvival()){
 								if($heldItem->isTool()){
 									if($heldItem->useOn($target) and $heldItem->getDamage() >= $heldItem->getMaxDurability()){
-										$this->inventory->setItemInHand(ItemFactory::get(Item::AIR, 0, 1));
+										$this->inventory->setItemInHand(ItemFactory::get(Item::AIR, 0, 0));
 									}else{
 										$this->inventory->setItemInHand($heldItem);
 									}

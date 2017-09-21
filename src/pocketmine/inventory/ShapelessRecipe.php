@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace pocketmine\inventory;
 
 use pocketmine\item\Item;
-use pocketmine\Server;
 use pocketmine\utils\UUID;
 
 class ShapelessRecipe implements CraftingRecipe{
@@ -44,7 +43,7 @@ class ShapelessRecipe implements CraftingRecipe{
 	/**
 	 * @return UUID|null
 	 */
-	public function getId(){
+	public function getId() : ?UUID{
 		return $this->id;
 	}
 
@@ -137,7 +136,7 @@ class ShapelessRecipe implements CraftingRecipe{
 		return $count;
 	}
 
-	public function registerToCraftingManager(CraftingManager $manager){
+	public function registerToCraftingManager(CraftingManager $manager) : void{
 		$manager->registerShapelessRecipe($this);
 	}
 
