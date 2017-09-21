@@ -134,7 +134,7 @@ namespace pocketmine {
 		echo "[CRITICAL] Please update your submodules or use provided builds." . PHP_EOL;
 		exit(1);
 	}
-	
+
 
 	if(!class_exists("ClassLoader", false)){
 		require_once(\pocketmine\PATH . "src/spl/ClassLoader.php");
